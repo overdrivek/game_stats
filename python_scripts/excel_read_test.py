@@ -1,10 +1,10 @@
 import pandas as pd
 import os
 import xlrd
-import country_stats as cstat
+import python_scripts.country_stats as cstat
 class tippspiel:
     def __init__(self):
-        file_name = os.path.normpath('C:/Users/naraya01/Google Drive/Colab Notebooks/world_cup_table.xlsx')
+        file_name = os.path.normpath('../Data/world_cup_table.xlsx')
         workbook = xlrd.open_workbook(file_name)
         self.original_scores = workbook.sheet_by_name('Original_Score')
         self.country_list = dict()
