@@ -31,7 +31,7 @@ class tippspiel:
     def parse_players(self):
         for player in self.players:
             predicted_score = self.workbook.sheet_by_name(player)
-            pst = pstat.player_stats(player_name = player,original_score=self.original_scores,predicted_score=predicted_score)
+            pst = pstat.player_stats(player_name = player,original_score=self.original_scores,predicted_score=predicted_score,country_stats=self.country_list)
             self.player_list[player] = pst
 
 if __name__ == '__main__':

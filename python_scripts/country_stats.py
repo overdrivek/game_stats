@@ -7,7 +7,9 @@ class country_stats:
         self.goals_scored = 0
         self.goals_conceded = 0
         self.points = 0
-
+        self.seed = 0
+        self.underdog_threshold = 20
+        self.is_underdog = False
         number_of_registered_games = scores.nrows
         for game_number in range(scores.nrows):
             score = scores.row_values(game_number)
@@ -21,6 +23,13 @@ class country_stats:
                     self.points += 3
                 elif score[3] == score[2]:
                     self.points += 1
+
+            if score[4] == self.name:
+                if self.seed == 0:
+                    self.seed = game_number
+                    if self.seed > self.underdog_threshold:
+                        self.is_underdog = True
+
 
 
 

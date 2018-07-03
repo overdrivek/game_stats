@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 class player_stats:
-    def __init__(self,player_name = None,original_score=None,predicted_score=None):
-        if player_name is None or original_score is None or predicted_score is None:
+    def __init__(self,player_name = None,original_score=None,predicted_score=None,country_stats=None):
+        if player_name is None or original_score is None or predicted_score is None or country_stats is None:
             return
 
         self.name = player_name
+        self.country_statlist = country_stats
         self.games_predicted_correct = 0
         self.total_games_predicted = 0
         self.total_games = 0
@@ -24,8 +26,12 @@ class player_stats:
 
         self.number_hausfrau_tips = 0
         self.number_selfbelief_genius_tips = 0
+        self.winning_team_tendency_list = dict()
+        self.underdog_tendency_list = dict()
+        self.prediction_team_tendency_list = dict()
 
         self.predicted = None
+        self.orig_scores = None
         predicted_h =  np.empty(len(predicted_score.col_values(2)))
         predicted_a = np.empty(len(predicted_score.col_values(2)))
 
@@ -43,15 +49,25 @@ class player_stats:
         self.predicted=np.array([predicted_h.T,predicted_a.T]).T
         self.original_score = original_score
         self.compute_performance()
+        self.winning_team_tendency_list = OrderedDict(sorted(self.winning_team_tendency_list.items(), key=lambda x: x[1], reverse=True))
+        self.underdog_tendency_list = OrderedDict(sorted(self.underdog_tendency_list.items(), key=lambda x: x[1], reverse=True))
+        self.prediction_team_tendency_list = OrderedDict(sorted(self.prediction_team_tendency_list.items(), key=lambda x: x[1], reverse=True))
+
+    def cumulate_tendency_list(self,game,tendency_list):
+        teams = [game[0],game[1]]
+        for team in teams:
+            if team not in tendency_list:
+                tendency_list[team] = 0
+        return tendency_list
 
     def compute_performance(self):
-        orig_scores = np.array([np.array(self.original_score.col_values(2)).T,np.array(self.original_score.col_values(3)).T]).T
-        diff_ = orig_scores-self.predicted
+        self.orig_scores = np.array([np.array(self.original_score.col_values(2)).T,np.array(self.original_score.col_values(3)).T]).T
+        diff_ = self.orig_scores-self.predicted
         diff_games = diff_[:,0]-diff_[:,1]
 
         self.correct_tendency = len(np.where(diff_games==0)[0])
         self.total_games_predicted = len(np.where(np.isnan(diff_games) == False)[0])
-        self.tendency_check(orig_scores)
+        self.tendency_check()
 
         self.percentage_correct = (self.games_predicted_correct/self.total_games)*100.0
         self.percentage_exact = (self.exact_prediction/self.total_games)*100.0
@@ -63,18 +79,39 @@ class player_stats:
 
         self.number_selfbelief_genius_tips = len(np.where(np.abs(diff_games) >= 4)[0])
 
-    def tendency_check(self,orig_scores):
+    def tendency_check(self):
 
-        exact_prediction_counter = 1
-        game_prediction_counter = 1
-        for orig_score,pred_score in zip(orig_scores,self.predicted):
+        exact_prediction_counter = 0
+        game_prediction_counter = 0
+        for game_number,(orig_score,pred_score) in enumerate(zip(self.orig_scores,self.predicted)):
+            game = self.original_score.row_values(game_number)
+            self.winning_team_tendency_list = self.cumulate_tendency_list(game, self.winning_team_tendency_list)
+            self.underdog_tendency_list = self.cumulate_tendency_list(game, self.underdog_tendency_list)
+            self.prediction_team_tendency_list = self.cumulate_tendency_list(game, self.prediction_team_tendency_list)
+
+            team_favoured = None
+            if pred_score[0] > pred_score[1]:
+                team_favoured = game[0]
+            elif pred_score[1] > pred_score[0]:
+                team_favoured = game[1]
+            if team_favoured is not None:
+                if self.country_statlist[team_favoured].is_underdog is True:
+                    if team_favoured in self.underdog_tendency_list:
+                        self.underdog_tendency_list[team_favoured] += 1
+
+                self.prediction_team_tendency_list[team_favoured] += 1
 
             if orig_score[0]-orig_score[1] == pred_score[0]-pred_score[1]:
                 if orig_score[0] == pred_score[0]  and orig_score[1] == pred_score[1]:
                     self.exact_prediction += 1
                     exact_prediction_counter += 1
 
+                if pred_score[0] > pred_score[1]:
+                    self.winning_team_tendency_list[game[0]] += 1
+                elif pred_score[0] < pred_score[1]:
+                    self.winning_team_tendency_list[game[1]] += 1
                 game_prediction_counter += 1
+
 
             elif np.sign(orig_score[0]-orig_score[1])==np.sign(pred_score[0]-pred_score[1]):
                 self.games_predicted_correct += 1
@@ -86,11 +123,11 @@ class player_stats:
             self.exact_prediction_array.append(exact_prediction_counter)
             self.correct_prediction_array.append(game_prediction_counter)
 
-        plt.figure()
-        plt.plot(np.arange(1,self.total_games+1),self.exact_prediction_array)
-        plt.plot(np.arange(1, self.total_games+1), self.correct_prediction_array)
-        plt.grid(True)
-        plt.xlabel('Number of Games')
-        plt.ylabel('Number of correctness')
-        plt.show()
+        # plt.figure()
+        # plt.plot(np.arange(1,self.total_games+1),self.exact_prediction_array)
+        # plt.plot(np.arange(1, self.total_games+1), self.correct_prediction_array)
+        # plt.grid(True)
+        # plt.xlabel('Number of Games')
+        # plt.ylabel('Number of correctness')
+        # plt.show()
         #self.correct_tendency = len(np.where(diff_goals==diff_pgoals)[0])
