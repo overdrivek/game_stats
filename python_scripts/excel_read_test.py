@@ -8,7 +8,7 @@ from scipy.interpolate import spline
 import numpy as np
 class tippspiel:
     def __init__(self):
-        file_name = os.path.normpath('../Data/world_cup_table.xlsx')
+        file_name = os.path.normpath('Data\\world_cup_table.xlsx')
         self.workbook = xlrd.open_workbook(file_name)
         self.original_scores = self.workbook.sheet_by_name('Original_Score')
         self.country_list = dict()
@@ -25,7 +25,7 @@ class tippspiel:
 
         self.parse_games()
         self.parse_players()
-        self.plot_test()
+        #self.plot_test()
 
     def parse_games(self):
         for country in self.unique_countries:
@@ -42,8 +42,8 @@ class tippspiel:
                 pass
 
     def plot_test(self):
-        plt.figure()
-        plt.subplot(3,1,1)
+        fig = plt.figure()
+        #plt.subplot(3,1,1)
         for player_name in self.player_list:
             player= self.player_list[player_name]
             player_pts = player.exact_prediction_array
@@ -56,18 +56,18 @@ class tippspiel:
             plt.grid(True)
             plt.xlabel('Game')
             plt.ylabel('# exact prediction')
-
-
-        plt.subplot(3,1,2)
-        for player_name in self.player_list:
-            player= self.player_list[player_name]
-            player_pts = player.correct_prediction_array
-            plt.plot(range(len(player_pts)),player_pts,label=player.name)
-            #plt.legend()
-            plt.grid(True)
-            plt.xlabel('Game')
-            plt.ylabel('# correct prediction')
         plt.show()
+
+        # plt.subplot(3,1,2)
+        # for player_name in self.player_list:
+        #     player= self.player_list[player_name]
+        #     player_pts = player.correct_prediction_array
+        #     plt.plot(range(len(player_pts)),player_pts,label=player.name)
+        #     #plt.legend()
+        #     plt.grid(True)
+        #     plt.xlabel('Game')
+        #     plt.ylabel('# correct prediction')
+        # plt.show()
 
 if __name__ == '__main__':
     tipspiel_parser = tippspiel()
