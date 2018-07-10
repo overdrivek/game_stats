@@ -16,6 +16,7 @@ class player_stats:
 
         self.correct_prediction_array = []
         self.exact_prediction_array = []
+        self.points_array = []
 
         self.percentage_correct = 0
         self.percentage_exact = 0
@@ -83,6 +84,7 @@ class player_stats:
 
         exact_prediction_counter = 0
         game_prediction_counter = 0
+        pts = 0
         for game_number,(orig_score,pred_score) in enumerate(zip(self.orig_scores,self.predicted)):
             game = self.original_score.row_values(game_number)
             self.winning_team_tendency_list = self.cumulate_tendency_list(game, self.winning_team_tendency_list)
@@ -101,27 +103,48 @@ class player_stats:
 
                 self.prediction_team_tendency_list[team_favoured] += 1
 
+            pt_type = None
+            # score difference is correct
             if orig_score[0]-orig_score[1] == pred_score[0]-pred_score[1]:
+                # prediction is spot on
                 if orig_score[0] == pred_score[0]  and orig_score[1] == pred_score[1]:
                     self.exact_prediction += 1
                     exact_prediction_counter += 1
+                    pt_type = 'Exact'
 
                 if pred_score[0] > pred_score[1]:
                     self.winning_team_tendency_list[game[0]] += 1
+                    if pt_type is None:
+                        pt_type = 'Tendency'
                 elif pred_score[0] < pred_score[1]:
                     self.winning_team_tendency_list[game[1]] += 1
-                game_prediction_counter += 1
+                    if pt_type is None:
+                        pt_type = 'Tendency'
 
+
+                game_prediction_counter += 1
 
             elif np.sign(orig_score[0]-orig_score[1])==np.sign(pred_score[0]-pred_score[1]):
                 self.games_predicted_correct += 1
                 game_prediction_counter += 1
+                pt_type='correct'
+
+            if pt_type == 'Exact':
+                pts += 4
+            elif pt_type == 'Tendency':
+                pts += 3
+            elif pt_type == 'correct':
+                pts += 2
+            else:
+                pts += 0
 
             if (pred_score[0] == 2 and pred_score[1] == 1) or (pred_score[0]==1 and pred_score[1]==2):
                 self.number_hausfrau_tips += 1
 
             self.exact_prediction_array.append(exact_prediction_counter)
             self.correct_prediction_array.append(game_prediction_counter)
+            self.points_array.append(pts)
+
 
         # plt.figure()
         # plt.plot(np.arange(1,self.total_games+1),self.exact_prediction_array)
@@ -131,3 +154,11 @@ class player_stats:
         # plt.ylabel('Number of correctness')
         # plt.show()
         #self.correct_tendency = len(np.where(diff_goals==diff_pgoals)[0])
+
+    def get_data(self,data_str=''):
+        if data_str == 'exact':
+            return (self.exact_prediction_array,'exact_predictions')
+        elif data_str == 'correct':
+            return (self.correct_prediction_array,'correct_predictions')
+        elif data_str == 'points':
+            return (self.points_array,'total_points')

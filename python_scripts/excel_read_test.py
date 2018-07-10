@@ -8,7 +8,7 @@ from scipy.interpolate import spline
 import numpy as np
 class tippspiel:
     def __init__(self):
-        file_name = os.path.normpath('Data\\world_cup_table.xlsx')
+        file_name = os.path.normpath('..\\Data\\world_cup_table.xlsx')
         self.workbook = xlrd.open_workbook(file_name)
         self.original_scores = self.workbook.sheet_by_name('Original_Score')
         self.country_list = dict()
