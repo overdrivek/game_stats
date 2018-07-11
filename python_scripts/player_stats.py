@@ -112,15 +112,13 @@ class player_stats:
                     self.exact_prediction += 1
                     exact_prediction_counter += 1
                     pt_type = 'Exact'
-
+                else:
+                    if pt_type is None:
+                        pt_type = 'Tendency'
                 if pred_score[0] > pred_score[1]:
                     self.winning_team_tendency_list[game[0]] += 1
-                    if pt_type is None:
-                        pt_type = 'Tendency'
                 elif pred_score[0] < pred_score[1]:
                     self.winning_team_tendency_list[game[1]] += 1
-                    if pt_type is None:
-                        pt_type = 'Tendency'
 
 
                 game_prediction_counter += 1
