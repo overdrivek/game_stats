@@ -162,3 +162,5 @@ class player_stats:
             return (self.correct_prediction_array,'correct_predictions')
         elif data_str == 'points':
             return (self.points_array,'total_points')
+        elif data_str == 'hf_tips':
+            return (self.number_hausfrau_tips, 'hausfrau/hausmann_Tipp')

@@ -6,6 +6,7 @@ import python_scripts.player_stats as pstat
 import matplotlib.pyplot as plt
 from scipy.interpolate import spline
 import numpy as np
+from scipy.stats import rankdata
 class tippspiel:
     def __init__(self):
         file_name = os.path.normpath('..\\Data\\world_cup_table.xlsx')
@@ -25,6 +26,7 @@ class tippspiel:
 
         self.parse_games()
         self.parse_players()
+        self.order_positions()
         #self.plot_test()
 
     def parse_games(self):
@@ -40,6 +42,27 @@ class tippspiel:
                 self.player_list[player] = pst
             except:
                 pass
+
+    def order_positions(self):
+        point_arrays = None
+        total_games = 0
+        player_names = []
+        for player in self.players:
+            if point_arrays is None:
+                point_arrays = np.array(self.player_list[player].points_array)
+            else:
+                point_arrays = np.vstack([point_arrays,np.array(self.player_list[player].points_array)])
+            player_names.append(self.player_list[player].name)
+
+        total_games = self.original_scores.nrows
+        # get rank
+        print('sorting')
+        rank_matrix = None
+        for game in range(total_games):
+            points = point_arrays[:,game]
+
+            rank_out = rankdata(-1*points, method='dense')
+            print("higest rank player after game {} is {}".format(game,player_names[rank_out[0]]))
 
     def plot_test(self):
         fig = plt.figure()
