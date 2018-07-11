@@ -62,7 +62,13 @@ class tippspiel:
             points = point_arrays[:,game]
 
             rank_out = rankdata(-1*points, method='dense')
-            print("higest rank player after game {} is {}".format(game,player_names[rank_out[0]]))
+            if rank_matrix is None:
+                rank_matrix = np.array(rank_out).transpose()
+            else:
+                rank_matrix = np.vstack([rank_matrix,np.array(rank_out).transpose()])
+        for i,player in enumerate(self.players):
+            self.player_list[player].table_position  = rank_matrix[:,i]
+
 
     def plot_test(self):
         fig = plt.figure()

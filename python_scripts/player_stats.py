@@ -17,6 +17,7 @@ class player_stats:
         self.correct_prediction_array = []
         self.exact_prediction_array = []
         self.points_array = []
+        self.table_position = []
 
         self.percentage_correct = 0
         self.percentage_exact = 0
@@ -157,10 +158,12 @@ class player_stats:
 
     def get_data(self,data_str=''):
         if data_str == 'exact':
-            return (self.exact_prediction_array,'exact_predictions')
+            return (self.exact_prediction_array,'Exact_predictions')
         elif data_str == 'correct':
-            return (self.correct_prediction_array,'correct_predictions')
+            return (self.correct_prediction_array,'Correct_predictions')
         elif data_str == 'points':
-            return (self.points_array,'total_points')
+            return (self.points_array,'Total_points')
         elif data_str == 'hf_tips':
-            return (self.number_hausfrau_tips, 'hausfrau/hausmann_Tipp')
+            return (self.number_hausfrau_tips, 'Hausfrau/Hausmann_Tipp')
+        elif data_str == 'table_pos':
+            return (self.table_position,'Standing')
