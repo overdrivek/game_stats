@@ -128,6 +128,11 @@ class player_stats:
                 game_prediction_counter += 1
                 pt_type='correct'
 
+                if pred_score[0] > pred_score[1]:
+                    self.winning_team_tendency_list[game[0]] += 1
+                elif pred_score[0] < pred_score[1]:
+                    self.winning_team_tendency_list[game[1]] += 1
+
             if pt_type == 'Exact':
                 pts += 4
             elif pt_type == 'Tendency':
