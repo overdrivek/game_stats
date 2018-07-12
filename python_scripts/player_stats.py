@@ -71,11 +71,11 @@ class player_stats:
         self.total_games_predicted = len(np.where(np.isnan(diff_games) == False)[0])
         self.tendency_check()
 
-        self.percentage_correct = (self.games_predicted_correct/self.total_games)*100.0
+        self.percentage_correct = (self.correct_prediction_array[-1]/self.total_games)*100.0
         self.percentage_exact = (self.exact_prediction/self.total_games)*100.0
         self.percentage_tend_correct = (self.correct_tendency/self.total_games)*100.0
 
-        self.percentile_correct = (self.games_predicted_correct / self.total_games_predicted) * 100.0
+        self.percentile_correct = (self.correct_prediction_array[-1]/ self.total_games_predicted) * 100.0
         self.percentile_exact = (self.exact_prediction / self.total_games_predicted) * 100.0
         self.percentile_tend_correct = (self.correct_tendency / self.total_games_predicted) * 100.0
 
@@ -165,3 +165,9 @@ class player_stats:
             return (self.number_hausfrau_tips, 'Hausfrau/Hausmann_Tipp')
         elif data_str == 'table_pos':
             return (self.table_position,'Standing')
+        elif data_str == 'selfbelief':
+            return (self.number_selfbelief_genius_tips, 'Brave_tips')
+        elif data_str == 'percentage_correct':
+            return (self.percentage_correct,'Percentage_correct')
+        elif data_str == 'winning_tendency':
+            return (self.winning_team_tendency_list,'Preferred team')
