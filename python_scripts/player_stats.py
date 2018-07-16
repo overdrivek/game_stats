@@ -176,3 +176,5 @@ class player_stats:
             return (self.percentage_correct,'Percentage_correct')
         elif data_str == 'winning_tendency':
             return (self.winning_team_tendency_list,'Preferred team')
+        elif data_str == 'underdog_tendency':
+            return (self.underdog_tendency_list,'Underdog_team')
