@@ -178,3 +178,5 @@ class player_stats:
             return (self.winning_team_tendency_list,'Preferred team')
         elif data_str == 'underdog_tendency':
             return (self.underdog_tendency_list,'Underdog_team')
+        elif data_str == 'drift':
+            return (self.correct_tendency,'Correct_goal_difference')
