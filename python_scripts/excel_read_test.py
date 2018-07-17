@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import spline
 import numpy as np
 from scipy.stats import rankdata
+from sklearn.preprocessing import MinMaxScaler
 class tippspiel:
     def __init__(self):
         file_name = os.path.normpath('..\\Data\\world_cup_table.xlsx')
@@ -89,35 +90,38 @@ class tippspiel:
         #     plt.ylabel('# correct prediction')
         # plt.show()
     def run_spurious(self):
-        # pd_dax = pd.read_csv('..\\Data\\Spurious_1_DAX.csv')
-        # closing_dax = pd_dax.iloc[:,4]
-        # plt.figure()
-        # for i,player in enumerate(self.players):
-        #     table_post = self.player_list[player].table_position
-        #     xvals = np.linspace(0, len(closing_dax), len(table_post))
-        #     x = np.linspace(0, len(closing_dax), len(closing_dax))
-        #     closing_dax_ip = np.interp(xvals, x, closing_dax)
-        #     corr_coeff = np.corrcoef(closing_dax_ip, table_post)
-        #     # print(np.array(closing_dax))
-        #     # print(np.array(pts_array))
-        #     from sklearn.preprocessing import MinMaxScaler
-        #     scaler = MinMaxScaler()
-        #     closing_dax_scaled = scaler.fit_transform(closing_dax_ip.reshape(-1, 1))
-        #     scaler = MinMaxScaler()
-        #     pts_array_scaled = 1- (scaler.fit_transform(np.array(table_post).reshape(-1, 1)))
-        #     self.player_list[player].closing_dax_scaled = closing_dax_scaled
-        #     self.player_list[player].table_position_scaled = pts_array_scaled
-        #     self.player_list[player].dax_corrcoeff = corr_coeff[0,1]
-            #plt.subplot(7,2,i+1)
-            #plt.plot(closing_dax_scaled)
-            #plt.plot(pts_array_scaled)
-            #plt.title('Player {}, correlation {}'.format(self.player_list[player].name,np.abs(corr_coeff[0,1])))
-            #plt.show()
-
-        pd_temp = pd.read_csv('..\\Data\\spurious_weather_info.csv')
+        pd_dax = pd.read_csv('..\\Data\\Spurious_1_DAX.csv')
+        closing_dax = pd_dax.iloc[:,4]
+        pd_temp = pd.read_csv('..\\Data\\spurious_weather_info.csv', sep=';')
         max_temp = pd_temp.iloc[:, 9]
-        print(np.array(max_temp))
+        #plt.figure()
+        for i,player in enumerate(self.players):
+            table_post = self.player_list[player].table_position
 
+            closing_dax_scaled,table_pos_scaled,corr_coeff_dax = self.get_interp(ref_series=closing_dax,act_series=table_post)
+            self.player_list[player].closing_dax_scaled = closing_dax_scaled
+            self.player_list[player].table_position_scaled = table_pos_scaled
+            self.player_list[player].dax_corrcoeff = corr_coeff_dax[0,1]
+
+            max_temp_scaled, table_pos_scaled, corr_coeff_temp = self.get_interp(ref_series=max_temp,act_series=table_post)
+
+            self.player_list[player].max_temp_scaled = max_temp_scaled
+            self.player_list[player].temp_corrcoeff = corr_coeff_temp[0, 1]
+
+    def get_interp(self,ref_series=None,act_series=None):
+        xvals = np.linspace(0, len(ref_series), len(act_series))
+        x = np.linspace(0, len(ref_series), len(ref_series))
+        ref_ip = np.interp(xvals, x, ref_series)
+        corr_coeff = np.corrcoef(ref_ip , act_series)
+        # print(np.array(closing_dax))
+        # print(np.array(pts_array))
+
+        scaler = MinMaxScaler()
+        ref_scaled = scaler.fit_transform(ref_ip .reshape(-1, 1))
+        scaler = MinMaxScaler()
+        act_scaled = 1 - (scaler.fit_transform(np.array(act_series).reshape(-1, 1)))
+
+        return ref_scaled,act_scaled,corr_coeff
 
 if __name__ == '__main__':
     tipspiel_parser = tippspiel()
