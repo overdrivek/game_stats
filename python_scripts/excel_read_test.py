@@ -89,30 +89,35 @@ class tippspiel:
         #     plt.ylabel('# correct prediction')
         # plt.show()
     def run_spurious(self):
-        pd_dax = pd.read_csv('..\\Data\\Spurious_1_DAX.csv')
-        closing_dax = pd_dax.iloc[:,4]
-        plt.figure()
-        for i,player in enumerate(self.players):
-            table_post = self.player_list[player].table_position
-            xvals = np.linspace(0, len(closing_dax), len(table_post))
-            x = np.linspace(0, len(closing_dax), len(closing_dax))
-            closing_dax_ip = np.interp(xvals, x, closing_dax)
-            corr_coeff = np.corrcoef(closing_dax_ip, table_post)
-            # print(np.array(closing_dax))
-            # print(np.array(pts_array))
-            from sklearn.preprocessing import MinMaxScaler
-            scaler = MinMaxScaler()
-            closing_dax_scaled = scaler.fit_transform(closing_dax_ip.reshape(-1, 1))
-            scaler = MinMaxScaler()
-            pts_array_scaled = 1- (scaler.fit_transform(np.array(table_post).reshape(-1, 1)))
-            self.player_list[player].closing_dax_scaled = closing_dax_scaled
-            self.player_list[player].table_position_scaled = pts_array_scaled
-            self.player_list[player].dax_corrcoeff = corr_coeff[0,1]
+        # pd_dax = pd.read_csv('..\\Data\\Spurious_1_DAX.csv')
+        # closing_dax = pd_dax.iloc[:,4]
+        # plt.figure()
+        # for i,player in enumerate(self.players):
+        #     table_post = self.player_list[player].table_position
+        #     xvals = np.linspace(0, len(closing_dax), len(table_post))
+        #     x = np.linspace(0, len(closing_dax), len(closing_dax))
+        #     closing_dax_ip = np.interp(xvals, x, closing_dax)
+        #     corr_coeff = np.corrcoef(closing_dax_ip, table_post)
+        #     # print(np.array(closing_dax))
+        #     # print(np.array(pts_array))
+        #     from sklearn.preprocessing import MinMaxScaler
+        #     scaler = MinMaxScaler()
+        #     closing_dax_scaled = scaler.fit_transform(closing_dax_ip.reshape(-1, 1))
+        #     scaler = MinMaxScaler()
+        #     pts_array_scaled = 1- (scaler.fit_transform(np.array(table_post).reshape(-1, 1)))
+        #     self.player_list[player].closing_dax_scaled = closing_dax_scaled
+        #     self.player_list[player].table_position_scaled = pts_array_scaled
+        #     self.player_list[player].dax_corrcoeff = corr_coeff[0,1]
             #plt.subplot(7,2,i+1)
             #plt.plot(closing_dax_scaled)
             #plt.plot(pts_array_scaled)
             #plt.title('Player {}, correlation {}'.format(self.player_list[player].name,np.abs(corr_coeff[0,1])))
             #plt.show()
+
+        pd_temp = pd.read_csv('..\\Data\\spurious_weather_info.csv')
+        max_temp = pd_temp.iloc[:, 9]
+        print(np.array(max_temp))
+
 
 if __name__ == '__main__':
     tipspiel_parser = tippspiel()
