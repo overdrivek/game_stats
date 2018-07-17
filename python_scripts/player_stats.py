@@ -39,6 +39,10 @@ class player_stats:
 
         self.total_games = len(predicted_score.col_values(2))
 
+        self.closing_dax_scaled = None
+        self.table_position_scaled = None
+        self.dax_corrcoeff = 0
+
         for i, (val_h,val_a) in enumerate(zip(predicted_score.col_values(2),predicted_score.col_values(3))):
             predicted_h[i] = None
             if val_h != '':
@@ -180,3 +184,9 @@ class player_stats:
             return (self.underdog_tendency_list,'Underdog_team')
         elif data_str == 'drift':
             return (self.correct_tendency,'Correct_goal_difference')
+        elif data_str == 'spurious_dax':
+            return ((self.closing_dax_scaled,self.table_position_scaled),('Dax_closing_scaled','Table_position'))
+
+    def get_data_val(self,data_str=''):
+        if data_str == 'spurious_dax':
+            return 'correlation_coefficient = '+str(self.dax_corrcoeff)

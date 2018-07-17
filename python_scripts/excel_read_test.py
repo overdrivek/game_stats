@@ -27,7 +27,8 @@ class tippspiel:
         self.parse_games()
         self.parse_players()
         self.order_positions()
-        #self.plot_test()
+        self.run_spurious()
+        self.plot_test()
 
     def parse_games(self):
         for country in self.unique_countries:
@@ -70,22 +71,12 @@ class tippspiel:
             self.player_list[player].table_position  = rank_matrix[:,i]
 
 
+
     def plot_test(self):
-        fig = plt.figure()
+
         #plt.subplot(3,1,1)
-        for player_name in self.player_list:
-            player= self.player_list[player_name]
-            player_pts = player.exact_prediction_array
-            #xnew = np.linspace(0,len(player_pts),100)
-            #xvals = np.arange(0,len(player_pts))
-            #ynew = spline(xvals,player_pts,xnew)
-            plt.plot(range(len(player_pts)),player_pts,label=player.name)
-            #plt.plot(xnew, ynew, label=player.name)
-            plt.legend(loc='best')
-            plt.grid(True)
-            plt.xlabel('Game')
-            plt.ylabel('# exact prediction')
-        plt.show()
+        for player in self.players:
+             data,data_str = self.player_list[player].get_data('spurious_dax')
 
         # plt.subplot(3,1,2)
         # for player_name in self.player_list:
@@ -97,6 +88,31 @@ class tippspiel:
         #     plt.xlabel('Game')
         #     plt.ylabel('# correct prediction')
         # plt.show()
+    def run_spurious(self):
+        pd_dax = pd.read_csv('..\\Data\\Spurious_1_DAX.csv')
+        closing_dax = pd_dax.iloc[:,4]
+        plt.figure()
+        for i,player in enumerate(self.players):
+            table_post = self.player_list[player].table_position
+            xvals = np.linspace(0, len(closing_dax), len(table_post))
+            x = np.linspace(0, len(closing_dax), len(closing_dax))
+            closing_dax_ip = np.interp(xvals, x, closing_dax)
+            corr_coeff = np.corrcoef(closing_dax_ip, table_post)
+            # print(np.array(closing_dax))
+            # print(np.array(pts_array))
+            from sklearn.preprocessing import MinMaxScaler
+            scaler = MinMaxScaler()
+            closing_dax_scaled = scaler.fit_transform(closing_dax_ip.reshape(-1, 1))
+            scaler = MinMaxScaler()
+            pts_array_scaled = 1- (scaler.fit_transform(np.array(table_post).reshape(-1, 1)))
+            self.player_list[player].closing_dax_scaled = closing_dax_scaled
+            self.player_list[player].table_position_scaled = pts_array_scaled
+            self.player_list[player].dax_corrcoeff = corr_coeff[0,1]
+            #plt.subplot(7,2,i+1)
+            #plt.plot(closing_dax_scaled)
+            #plt.plot(pts_array_scaled)
+            #plt.title('Player {}, correlation {}'.format(self.player_list[player].name,np.abs(corr_coeff[0,1])))
+            #plt.show()
 
 if __name__ == '__main__':
     tipspiel_parser = tippspiel()
